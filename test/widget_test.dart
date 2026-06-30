@@ -1,30 +1,72 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:badwallet_flutter/main.dart';
+import 'package:badwallet_flutter/models/wallet_model.dart';
+import 'package:badwallet_flutter/models/transaction_model.dart';
+import 'package:badwallet_flutter/models/bill_model.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('BadWallet Data Models Tests', () {
+    test('Wallet Model JSON Parsing', () {
+      final json = {
+        'id': 105,
+        'phoneNumber': '+221770000003',
+        'email': 'user3@example.com',
+        'code': 'WLT-003',
+        'currency': 'XOF',
+        'balance': 56000.00,
+        'createdAt': '2026-06-29T14:42:24.136905',
+        'updatedAt': '2026-06-30T14:15:27.600624'
+      };
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      final wallet = Wallet.fromJson(json);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(wallet.id, 105);
+      expect(wallet.phoneNumber, '+221770000003');
+      expect(wallet.email, 'user3@example.com');
+      expect(wallet.code, 'WLT-003');
+      expect(wallet.balance, 56000.00);
+      expect(wallet.currency, 'XOF');
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('Transaction Model JSON Parsing and Direction Helpers', () {
+      final json = {
+        'id': 7,
+        'reference': 'TXN-BCFD06099A554633',
+        'type': 'TRANSFER',
+        'amount': 6000.00,
+        'walletPhone': '+221770000003',
+        'destinationPhone': '+221770000001',
+        'createdAt': '2026-06-29T14:53:58.307416'
+      };
+
+      final transaction = Transaction.fromJson(json);
+
+      expect(transaction.id, 7);
+      expect(transaction.reference, 'TXN-BCFD06099A554633');
+      expect(transaction.amount, 6000.0);
+      expect(transaction.walletPhone, '+221770000003');
+      
+      // Test helper logic
+      expect(transaction.isIncoming('+221770000001'), true);
+      expect(transaction.isIncoming('+221770000003'), false);
+    });
+
+    test('Bill Model JSON Parsing', () {
+      final json = {
+        'reference': 'FAC-ISM-3-1',
+        'amount': 50000.00,
+        'serviceName': 'ISM',
+        'clientCode': '+221770000003',
+        'dueDate': '2026-06-15',
+        'status': 'IMPAYEE'
+      };
+
+      final bill = Bill.fromJson(json);
+
+      expect(bill.reference, 'FAC-ISM-3-1');
+      expect(bill.amount, 50000.0);
+      expect(bill.serviceName, 'ISM');
+      expect(bill.clientCode, '+221770000003');
+      expect(bill.status, 'IMPAYEE');
+    });
   });
 }
