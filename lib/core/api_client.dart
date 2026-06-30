@@ -11,10 +11,14 @@ class ApiClient {
   ApiClient() {
     // Determine baseUrl dynamically based on platform:
     // Android emulator needs 10.0.2.2 to connect to host's localhost.
+    // Real Android device uses the host machine's LAN IP (192.168.1.11).
     // iOS and web can connect directly to localhost.
     String baseUrl = 'http://localhost:8080';
     if (!kIsWeb && Platform.isAndroid) {
+      // Pour l'émulateur Android (pointe vers le localhost de la machine hôte)
       baseUrl = 'http://10.0.2.2:8080';
+      // Pour un appareil Android physique, décommentez la ligne ci-dessous avec votre IP locale :
+      // baseUrl = 'http://192.168.1.11:8080';
     }
 
     _dio = Dio(
